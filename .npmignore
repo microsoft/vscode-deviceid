@@ -2,7 +2,7 @@
 build
 .github
 node_modules
-src
+src/*.ts
 typings_patches
 .gitignore
 .npmignore
