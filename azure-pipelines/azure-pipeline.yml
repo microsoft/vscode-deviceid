@@ -30,9 +30,9 @@ extends:
   # For non-production pipelines, use "Unofficial" as defined below.
   # For productions pipelines, use "Official".
   ${{ if parameters.Publish }}:
-    template: azure-pipelines/MicroBuild.1ES.Official.Publish.yml@MicroBuildTemplate
+    template: /azure-pipelines/MicroBuild.1ES.Official.Publish.yml@MicroBuildTemplate
   ${{ else }}:
-    template: azure-pipelines/MicroBuild.1ES.Official.yml@MicroBuildTemplate
+    template: /azure-pipelines/MicroBuild.1ES.Official.yml@MicroBuildTemplate
   parameters:
     customBuildTags:
     - Ignore-Tag
@@ -81,7 +81,7 @@ extends:
           displayName: 'Create npm package' 
 
         - ${{ if parameters.Publish }}:
-          - template: MicroBuild.Publish.yml@MicroBuildTemplate
+          - template: /azure-pipelines/MicroBuild.Publish.yml@MicroBuildTemplate
             parameters: 
               intent: 'PackageDistribution'
               contentType: 'npm'
