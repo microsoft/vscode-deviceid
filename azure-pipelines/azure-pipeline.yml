@@ -16,6 +16,9 @@ variables:
 - name: TeamName
   value: 'Visual Studio Technical Insights'
 
+  Codeql.Enabled: true
+  Codeql.TSAEnabled: true
+  Codeql.TSAOptionsPath: $(Build.SourcesDirectory)\.config\TSAOptions.json
 
 # The `resources` specify the location and version of the 1ES PT.
 resources:
@@ -95,3 +98,7 @@ extends:
           inputs:
             targetPath: '$(Build.ArtifactStagingDirectory)'
             artifactName: output
+
+        task: TSAUpload@2
+          displayName: 'TSA upload to Codebase (vscode-deviceid)'
+          GdnPublishTsaConfigFile: '$(Build.SourcesDirectory)/.config/TSAOptions.json'
