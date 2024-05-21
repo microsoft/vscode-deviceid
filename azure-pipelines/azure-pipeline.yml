@@ -14,9 +14,6 @@ parameters:
 
 variables:
   TeamName: 'Visual Studio Technical Insights'
-  Codeql.Enabled: true
-  Codeql.TSAEnabled: true
-  Codeql.TSAOptionsPath: $(Build.SourcesDirectory)\.config\TSAOptions.json
 
 # The `resources` specify the location and version of the 1ES PT.
 resources:
