@@ -12,6 +12,7 @@
 		"noUnusedLocals": true,
 		"noUnusedParameters": true,
 		"noUncheckedIndexedAccess": true,
-		"moduleResolution": "node"
+		"moduleResolution": "node",
+		"declaration": true
 	}
 }
