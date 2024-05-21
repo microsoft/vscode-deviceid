@@ -13,9 +13,7 @@ parameters:
   default: false
 
 variables:
-- name: TeamName
-  value: 'Visual Studio Technical Insights'
-
+  TeamName: 'Visual Studio Technical Insights'
 
 # The `resources` specify the location and version of the 1ES PT.
 resources:
@@ -36,8 +34,8 @@ extends:
     pool:
       name: VSEngSS-MicroBuild2022-1ES
       os: windows  # OS of the image. Allowed values: windows, linux, macOS
-    stages:
     
+    stages:
     - stage: BuildAndPublishNpmPackage
       jobs:
       - job: BuildAndPublish
@@ -100,3 +98,9 @@ extends:
           inputs:
             targetPath: '$(Build.ArtifactStagingDirectory)'
             artifactName: output
+
+        - task: TSAUpload@2
+          inputs:
+            GdnPublishTsaOnboard: true
+            GdnPublishTsaConfigFile: '$(Build.SourcesDirectory)/.config/TSAOptions.json'
+          displayName: 'TSA upload to Codebase (vscode-deviceid)'
