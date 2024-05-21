@@ -1,6 +1,6 @@
 {
   "name": "@vscode/deviceid",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A module for Visual Studio Code to generate a unique device ID",
   "main": "./dist/index.js",
   "scripts": {
