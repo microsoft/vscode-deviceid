@@ -99,6 +99,6 @@ extends:
             targetPath: '$(Build.ArtifactStagingDirectory)'
             artifactName: output
 
-        task: TSAUpload@2
+        - task: TSAUpload@2
           displayName: 'TSA upload to Codebase (vscode-deviceid)'
           GdnPublishTsaConfigFile: '$(Build.SourcesDirectory)/.config/TSAOptions.json'
