@@ -39,14 +39,16 @@ extends:
       codeql:
         compiled:
           enabled: true
-        tsaEnabled: true
+        tsaEnabled: true  
+      tsa:
+        enabled: true
     customBuildTags:
     - Ignore-Tag
     pool:
       name: VSEngSS-MicroBuild2022-1ES
       os: windows  # OS of the image. Allowed values: windows, linux, macOS
-    stages:
     
+    stages:
     - stage: BuildAndPublishNpmPackage
       jobs:
       - job: BuildAndPublish
@@ -103,5 +105,7 @@ extends:
             artifactName: output
 
         - task: TSAUpload@2
+          inputs:
+            GdnPublishTsaOnboard: true
+            GdnPublishTsaConfigFile: '$(Build.SourcesDirectory)/.config/TSAOptions.json'
           displayName: 'TSA upload to Codebase (vscode-deviceid)'
-          GdnPublishTsaConfigFile: '$(Build.SourcesDirectory)/.config/TSAOptions.json'
