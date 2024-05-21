@@ -13,9 +13,7 @@ parameters:
   default: false
 
 variables:
-- name: TeamName
-  value: 'Visual Studio Technical Insights'
-
+  TeamName: 'Visual Studio Technical Insights'
   Codeql.Enabled: true
   Codeql.TSAEnabled: true
   Codeql.TSAOptionsPath: $(Build.SourcesDirectory)\.config\TSAOptions.json
@@ -37,6 +35,11 @@ extends:
   ${{ else }}:
     template: /azure-pipelines/MicroBuild.1ES.Official.yml@MicroBuildTemplate
   parameters:
+    globalSdl:
+      codeql:
+        compiled:
+          enabled: true
+        tsaEnabled: true
     customBuildTags:
     - Ignore-Tag
     pool:
