@@ -32,13 +32,6 @@ extends:
   ${{ else }}:
     template: /azure-pipelines/MicroBuild.1ES.Official.yml@MicroBuildTemplate
   parameters:
-    globalSdl:
-      codeql:
-        compiled:
-          enabled: true
-        tsaEnabled: true  
-      tsa:
-        enabled: true
     customBuildTags:
     - Ignore-Tag
     pool:
