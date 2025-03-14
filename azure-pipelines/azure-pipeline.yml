@@ -36,16 +36,16 @@ extends:
       os: windows  # OS of the image. Allowed values: windows, linux, macOS
     
     stages:
-    - stage: BuildAndPublishNpmPackage
+    - stage: BuildNpmPackage
       jobs:
-      - job: BuildAndPublish
+      - job: Build
         templateContext:
           mb:
             signing:
               enabled: true
               signType: Test
               zipSources: false
-        displayName: Build and publish npm package
+        displayName: Build npm package
 
         steps:
         - task: NodeTool@0
@@ -82,17 +82,6 @@ extends:
         - powershell: | 
             Get-ChildItem -Path "$(Build.ArtifactStagingDirectory)\npmpackages"
           displayName: Get contents of $(Build.ArtifactStagingDirectory)\npmpackages
-
-        - ${{ if parameters.Publish }}:
-          - template: /azure-pipelines/MicroBuild.Publish.yml@MicroBuildTemplate
-            parameters: 
-              intent: 'PackageDistribution'
-              contentType: 'npm'
-              contentSource: 'Folder'
-              folderLocation: '$(Build.ArtifactStagingDirectory)\npmpackages'
-              waitForReleaseCompletion: true
-              owners: 'piel@microsoft.com'
-              approvers: 'rdawson@microsoft.com'
 
         - task: 1ES.PublishPipelineArtifact@1
           inputs:

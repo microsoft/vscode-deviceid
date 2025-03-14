@@ -1,0 +1,43 @@
+trigger: none # We only want to trigger manually or based on resources
+pr: none
+
+resources:
+  repositories:
+    - repository: MicroBuildTemplate
+      type: git
+      name: 1ESPipelineTemplates/MicroBuildTemplate
+      ref: refs/tags/release
+  pipelines:
+    - pipeline: CI
+      source: vscode-deviceid
+      trigger: true # run release pipeline when CI pipeline completes
+
+extends:
+  template: azure-pipelines/MicroBuild.1ES.Official.yml@MicroBuildTemplate
+  parameters:
+    sdl:
+      sourceAnalysisPool: VSEngSS-MicroBuild2022-1ES
+    stages:
+      - job: Publish NPM Package
+        displayName: Publish NPM Package Job
+        templateContext:
+          type: releaseJob # Required, this indicates this job is a release job
+          isProduction: true # Required, must be 'true' or 'false'
+          inputs: # All input build artifacts must be declared here
+            - input: pipelineArtifact # Required, type of the input artifact
+              artifactName: output # Required, name of the pipeline artifact
+              targetPath: $(Pipeline.Workspace)/drop # Optional, specifies where the artifact is downloaded
+        steps:
+          - script: |
+              echo "Contents of $(Pipeline.Workspace)/drop/npmpackages:"
+              ls -la $(Pipeline.Workspace)/drop/npmpackages
+            displayName: "Output contents of npmpackages folder"
+        #  - template: /azure-pipelines/MicroBuild.Publish.yml@MicroBuildTemplate
+        #     parameters:
+        #       intent: 'PackageDistribution'
+        #       contentType: 'npm'
+        #       contentSource: 'Folder'
+        #       folderLocation: '$(Pipeline.Workspace)/drop/npmpackages'
+        #       waitForReleaseCompletion: true
+        #       owners: 'piel@microsoft.com'
+        #       approvers: 'rdawson@microsoft.com'
