@@ -21,13 +21,13 @@ resources:
   - repository: MicrobuildTemplate
     type: git
     name: 1ESPipelineTemplates/MicroBuildTemplate
-    ref: refs/heads/release
+    ref: refs/tags/release
 
 extends:
   # The pipeline extends the 1ES PT which will inject different SDL and compliance tasks.
   # For non-production pipelines, use "Unofficial" as defined below.
   # For productions pipelines, use "Official".
-  template: /azure-pipelines/MicroBuild.1ES.Official.Publish.yml@MicroBuildTemplate
+  template: azure-pipelines/MicroBuild.1ES.Official.yml@MicroBuildTemplate
   parameters:
     customBuildTags:
     - Ignore-Tag
@@ -36,16 +36,16 @@ extends:
       os: windows  # OS of the image. Allowed values: windows, linux, macOS
     
     stages:
-    - stage: BuildAndPublishNpmPackage
+    - stage: BuildNpmPackage
       jobs:
-      - job: BuildAndPublish
+      - job: Build
         templateContext:
           mb:
             signing:
               enabled: true
               signType: Test
               zipSources: false
-        displayName: Build and publish npm package
+        displayName: Build npm package
 
         steps:
         - task: NodeTool@0
@@ -83,21 +83,15 @@ extends:
             Get-ChildItem -Path "$(Build.ArtifactStagingDirectory)\npmpackages"
           displayName: Get contents of $(Build.ArtifactStagingDirectory)\npmpackages
 
-        - ${{ if parameters.Publish }}:
-          - template: /azure-pipelines/MicroBuild.Publish.yml@MicroBuildTemplate
-            parameters: 
-              intent: 'PackageDistribution'
-              contentType: 'npm'
-              contentSource: 'Folder'
-              folderLocation: '$(Build.ArtifactStagingDirectory)\npmpackages'
-              waitForReleaseCompletion: true
-              owners: 'piel@microsoft.com'
-              approvers: 'rdawson@microsoft.com'
-
         - task: 1ES.PublishPipelineArtifact@1
           inputs:
             targetPath: '$(Build.ArtifactStagingDirectory)'
-            artifactName: output
+            artifactName: drop
+
+        - ${{ if parameters.Publish }}:
+          - script: |
+              echo ##vso[build.addbuildtag]auto-release
+            displayName: 'Apply auto-release tag'
 
         - task: TSAUpload@2
           inputs:
