@@ -30,12 +30,14 @@ extends:
             artifactName: output  # Required, name of the pipeline artifact
             targetPath: $(Pipeline.Workspace)/drop  # Optional, specifies where the artifact is downloaded
         steps:
-        - template: /azure-pipelines/MicroBuild.Publish.yml@MicroBuildTemplate
-          parameters: 
-            intent: 'PackageDistribution'
-            contentType: 'npm'
-            contentSource: 'Folder'
-            folderLocation: '$(Build.ArtifactStagingDirectory)\drop'
-            waitForReleaseCompletion: true
-            owners: 'piel@microsoft.com'
-            approvers: 'rdawson@microsoft.com'
+        - script: echo "Release job started"
+          displayName: 'Release Job Script'
+        # - template: /azure-pipelines/MicroBuild.Publish.yml@MicroBuildTemplate
+        #   parameters: 
+        #     intent: 'PackageDistribution'
+        #     contentType: 'npm'
+        #     contentSource: 'Folder'
+        #     folderLocation: '$(Build.ArtifactStagingDirectory)\drop'
+        #     waitForReleaseCompletion: true
+        #     owners: 'piel@microsoft.com'
+        #     approvers: 'rdawson@microsoft.com'
