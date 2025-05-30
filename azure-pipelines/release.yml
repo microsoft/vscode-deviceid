@@ -27,7 +27,7 @@ extends:
           isProduction: true  # Required, must be 'true' or 'false'
           inputs:  # All input build artifacts must be declared here
           - input: pipelineArtifact  # Required, type of the input artifact
-            artifactName: output  # Required, name of the pipeline artifact
+            artifactName: output/npmpackages  # Required, name of the pipeline artifact
             targetPath: $(Pipeline.Workspace)/drop  # Optional, specifies where the artifact is downloaded
         steps:
         - script: echo "Release job started"
