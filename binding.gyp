@@ -14,7 +14,7 @@
             "VCCLCompilerTool": {
               "AdditionalOptions": [
                 "/guard:cf",
-								"/sdl",
+                "/sdl",
                 "/W3",
                 "/we4146",
                 "/we4244",
