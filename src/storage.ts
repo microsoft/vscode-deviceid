@@ -42,7 +42,12 @@ export async function getDeviceId(): Promise<string | undefined> {
 		if (!(await exists(getDeviceIdFilePath()))) {
 			return undefined;
 		} else {
-			return fs.readFile(getDeviceIdFilePath(), "utf8");
+			const content = await fs.readFile(getDeviceIdFilePath(), "utf8");
+			// Strip a leading UTF-8 BOM (U+FEFF) if present. Node's "utf8"
+			// decoding does not strip it, and a stray BOM in the device ID
+			// breaks downstream consumers that put the value in HTTP headers
+			// (see issue #34).
+			return content.replace(/^\uFEFF/, "");
 		}
 	}
 }
