@@ -6,7 +6,8 @@
 if (
 	process.platform !== "win32" &&
 	process.platform !== "darwin" &&
-	process.platform !== "linux"
+	process.platform !== "linux" &&
+	process.platform !== "freebsd"
 ) {
 	throw new Error("Unsupported platform");
 }
