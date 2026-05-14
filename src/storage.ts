@@ -47,7 +47,23 @@ export async function getDeviceId(): Promise<string | undefined> {
 			// decoding does not strip it, and a stray BOM in the device ID
 			// breaks downstream consumers that put the value in HTTP headers
 			// (see issue #34).
-			return content.replace(/^\uFEFF/, "");
+			if (content.charCodeAt(0) === 0xfeff) {
+				const stripped = content.replace(/^\uFEFF/, "");
+				// Rewrite the file without the BOM so future reads (including
+				// from other consumers) get a clean value.
+				try {
+					await fs.writeFile(
+						getDeviceIdFilePath(),
+						stripped,
+						"utf8",
+					);
+				} catch {
+					// Best-effort rewrite; ignore failures and still return
+					// the stripped value to the caller.
+				}
+				return stripped;
+			}
+			return content;
 		}
 	}
 }
