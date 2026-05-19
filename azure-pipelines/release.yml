@@ -18,7 +18,7 @@ variables:
   TeamName: 'Visual Studio Technical Insights'
 
 extends:
-  template: azure-pipelines/MicroBuild.1ES.Official.yml@MicroBuildTemplate
+  template: azure-pipelines/MicroBuild.1ES.Official.Publish.yml@MicroBuildTemplate
   parameters:
     sdl:
       sourceAnalysisPool: VSEng-MicroBuildVSStable
