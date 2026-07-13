@@ -29,6 +29,8 @@ extends:
   # For productions pipelines, use "Official".
   template: azure-pipelines/MicroBuild.1ES.Official.yml@MicroBuildTemplate
   parameters:
+    settings:
+      networkIsolationPolicy: Permissive,CFSClean,CFSClean2
     customBuildTags:
     - Ignore-Tag
     pool:
