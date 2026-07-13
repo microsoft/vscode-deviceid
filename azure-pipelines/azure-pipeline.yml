@@ -14,6 +14,8 @@ parameters:
 
 variables:
   TeamName: 'Visual Studio Technical Insights'
+  # Route pip through the internal CFS feed; must be set before UsePythonVersion@0 runs its own pip upgrade.
+  PIP_CONFIG_FILE: '$(Build.SourcesDirectory)/pip.ini'
 
 # The `resources` specify the location and version of the 1ES PT.
 resources:
@@ -56,10 +58,20 @@ extends:
             versionSpec: "24.x"
           displayName: 'Install Node.js'
 
+        - task: PipAuthenticate@1
+          inputs:
+            artifactFeeds: 'DevDiv/VSTelemetryImpl'
+          displayName: 'Authenticate pip feed'
+
         # lock to older version of python. We need diskutils which was removed in Python 3.12
         - task: UsePythonVersion@0
           inputs:
             versionSpec: '3.11'
+
+        - task: npmAuthenticate@0
+          inputs:
+            workingFile: .npmrc
+          displayName: 'Authenticate npm feed'
 
         - script: |
             npm ci
