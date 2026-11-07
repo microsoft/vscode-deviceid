@@ -17,6 +17,10 @@ dist/**/*
 # build
 build/**/*
 
+# Native prebuilds and symbol staging
+prebuilds/
+symbols/
+
 # Packaged node modules
 *.tgz
 

@@ -78,18 +78,49 @@ extends:
           displayName: 'Authenticate npm feed'
 
         - script: |
-            npm ci
+            npm ci --ignore-scripts
           displayName: 'Install dependencies'
 
         - script: |
             npm run build
           displayName: 'Compile npm package'
 
-        # Commenting out until we have tests
-        # - script: |
-        #     npm run test
-        #   displayName: 'Test npm package'
-        
+        - ${{ each arch in split('x64,arm64', ',') }}:
+          - script: |
+              npm run prebuild:windows -- --arch=${{ arch }}
+            displayName: 'Build Windows ${{ arch }} prebuild'
+
+          # The next prebuild replaces build\Release, so preserve its PDB now.
+          - powershell: |
+              $ErrorActionPreference = 'Stop'
+              $binary = "$(Build.SourcesDirectory)\prebuilds\win32-${{ arch }}\@vscode+deviceid.node"
+              $pdb = "$(Build.SourcesDirectory)\build\Release\windows.pdb"
+              foreach ($file in @($binary, $pdb)) {
+                if (-not (Test-Path -LiteralPath $file -PathType Leaf)) {
+                  throw "Required Windows ${{ arch }} symbol input is missing: $file"
+                }
+              }
+              $destination = "$(Build.ArtifactStagingDirectory)\symbols\win32-${{ arch }}"
+              New-Item -ItemType Directory -Path $destination -Force | Out-Null
+              Copy-Item -LiteralPath $binary, $pdb -Destination $destination
+            displayName: 'Preserve Windows ${{ arch }} binary and matching PDB'
+
+        - script: |
+            npm test
+          displayName: 'Test npm package'
+
+        - script: |
+            npm run lint
+          displayName: 'Lint npm package'
+
+        - task: PublishSymbols@2
+          displayName: 'Index Windows prebuild sources'
+          inputs:
+            SymbolsFolder: '$(Build.ArtifactStagingDirectory)\symbols'
+            SearchPattern: '**/*.pdb'
+            IndexSources: true
+            PublishSymbols: false
+
         - powershell: | 
             New-Item -ItemType Directory -Path "$(Build.ArtifactStagingDirectory)\npmpackages" -Force
           displayName: Create npm package directory
@@ -97,6 +128,34 @@ extends:
         - script: | 
             npm pack --pack-destination "$(Build.ArtifactStagingDirectory)\npmpackages"
           displayName: 'Create npm package' 
+
+        - script: |
+            npm run test:package -- "$(Build.ArtifactStagingDirectory)\npmpackages"
+          displayName: 'Test packed npm package'
+
+        - powershell: |
+            @'
+            const assert = require('node:assert/strict');
+            const { execFileSync } = require('node:child_process');
+            const { createHash } = require('node:crypto');
+            const fs = require('node:fs');
+            const path = require('node:path');
+            const staging = process.argv[2];
+            const packageDirectory = path.join(staging, 'npmpackages');
+            const packages = fs.readdirSync(packageDirectory).filter(name => name.endsWith('.tgz'));
+            assert.equal(packages.length, 1, 'Expected exactly one packed npm package');
+            const tarball = path.join(packageDirectory, packages[0]);
+            const hash = data => createHash('sha256').update(data).digest('hex');
+            for (const arch of ['x64', 'arm64']) {
+              const name = '@vscode+deviceid.node';
+              const entry = `package/prebuilds/win32-${arch}/${name}`;
+              const packed = execFileSync('tar', ['-xOf', tarball, entry], { maxBuffer: 64 * 1024 * 1024 });
+              const staged = fs.readFileSync(path.join(staging, 'symbols', `win32-${arch}`, name));
+              assert.equal(hash(packed), hash(staged), `Packed Windows ${arch} binary differs from staged symbol binary`);
+              console.log(`Verified Windows ${arch} packaged binary matches staged symbol binary`);
+            }
+            '@ | node - "$(Build.ArtifactStagingDirectory)"
+          displayName: 'Verify packaged binaries match staged symbol binaries'
 
         - powershell: | 
             Get-ChildItem -Path "$(Build.ArtifactStagingDirectory)\npmpackages"
