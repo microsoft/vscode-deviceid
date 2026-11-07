@@ -41,7 +41,7 @@ export async function getDeviceId(): Promise<string | undefined> {
 	if (process.platform === "win32") {
 		return windowRegistry?.GetDeviceId() as string;
 	} else {
-		if (!(await exists(getDeviceIdFilePath()))) {
+		if (!(await fs.pathExists(getDeviceIdFilePath()))) {
 			return undefined;
 		} else {
 			const content = await fs.readFile(getDeviceIdFilePath(), "utf8");
@@ -67,16 +67,6 @@ export async function getDeviceId(): Promise<string | undefined> {
 			}
 			return content;
 		}
-	}
-}
-
-async function exists(path: string): Promise<boolean> {
-	try {
-		await fs.promises.access(path);
-
-		return true;
-	} catch {
-		return false;
 	}
 }
 
