@@ -10,7 +10,7 @@ export async function getDeviceId(): Promise<string> {
 	let deviceId: string | undefined;
 	try {
 		deviceId = await storage.getDeviceId();
-	} catch (e) {
+	} catch {
 		// Regenerate the deviceId if it cannot be read
 	}
 

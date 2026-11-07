@@ -7,6 +7,8 @@ import * as path from "path";
 import * as fs from "fs-extra";
 const windowRegistry =
 	process.platform === "win32"
+		// Load the native module only on Windows.
+		// eslint-disable-next-line @typescript-eslint/no-require-imports
 		? require("../build/Release/windows.node")
 		: null;
 
