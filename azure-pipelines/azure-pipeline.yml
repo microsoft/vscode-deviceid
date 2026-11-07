@@ -132,6 +132,8 @@ extends:
         - script: |
             npm run test:package -- "$(Build.ArtifactStagingDirectory)\npmpackages"
           displayName: 'Test packed npm package'
+          env:
+            npm_config_userconfig: '$(Build.SourcesDirectory)\.npmrc'
 
         - powershell: |
             @'
