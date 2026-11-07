@@ -5,10 +5,14 @@
   "main": "./dist/index.js",
   "typings": "./dist/index.d.ts",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "npm run compile && node --test",
+    "test:package": "node scripts/verify-package.mjs",
     "build": "npm run compile",
     "compile": "tsc",
-    "lint": "eslint . --max-warnings 0 --report-unused-disable-directives",
+    "install": "node scripts/install.mjs",
+    "prebuild:windows": "prebuildify --napi --target 20.19.0",
+    "prepack": "npm run compile && node scripts/check-prebuilds.mjs",
+    "lint": "eslint . --ext .js,.mjs,.ts --max-warnings 0 --report-unused-disable-directives",
     "lint:fix": "npm run lint -- --fix"
   },
   "repository": {
@@ -28,11 +32,14 @@
     "@typescript-eslint/eslint-plugin": "^8.71.1-alpha.14",
     "@typescript-eslint/parser": "^8.71.1-alpha.14",
     "eslint": "^8.57.0",
+    "node-gyp": "^12.4.0",
+    "prebuildify": "^6.0.1",
     "prettier": "^3.2.5",
     "typescript": "~6.0.3"
   },
   "dependencies": {
     "fs-extra": "^11.2.0",
+    "node-gyp-build": "^4.8.4",
     "uuid": "^14.0.0"
   }
 }

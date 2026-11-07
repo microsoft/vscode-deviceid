@@ -5,11 +5,16 @@
 
 import * as path from "path";
 import * as fs from "fs-extra";
+import loadNativeModule from "node-gyp-build";
+
+interface WindowsRegistry {
+	GetDeviceId(): string;
+	SetDeviceId(deviceId: string): void;
+}
+
 const windowRegistry =
 	process.platform === "win32"
-		// Load the native module only on Windows.
-		// eslint-disable-next-line @typescript-eslint/no-require-imports
-		? require("../build/Release/windows.node")
+		? loadNativeModule(path.join(__dirname, "..")) as WindowsRegistry
 		: null;
 
 const deviceIdFileName = "deviceid";
@@ -39,7 +44,7 @@ function getDeviceIdFilePath(): string {
 
 export async function getDeviceId(): Promise<string | undefined> {
 	if (process.platform === "win32") {
-		return windowRegistry?.GetDeviceId() as string;
+		return windowRegistry?.GetDeviceId();
 	} else {
 		if (!(await exists(getDeviceIdFilePath()))) {
 			return undefined;
