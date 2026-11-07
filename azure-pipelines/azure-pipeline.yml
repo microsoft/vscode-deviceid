@@ -113,14 +113,6 @@ extends:
             npm run lint
           displayName: 'Lint npm package'
 
-        - task: PublishSymbols@2
-          displayName: 'Index Windows prebuild sources'
-          inputs:
-            SymbolsFolder: '$(Build.ArtifactStagingDirectory)\symbols'
-            SearchPattern: '**/*.pdb'
-            IndexSources: true
-            PublishSymbols: false
-
         - powershell: | 
             New-Item -ItemType Directory -Path "$(Build.ArtifactStagingDirectory)\npmpackages" -Force
           displayName: Create npm package directory

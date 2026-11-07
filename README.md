@@ -43,8 +43,8 @@ installs the tarball with build tooling blocked, then with install scripts
 disabled, and loads the native exports without modifying the device ID.
 
 CI preserves each binary and its matching PDB before building the next
-architecture, source-indexes the PDBs, and retains both pairs under `symbols` in
-the build drop. PDBs are not included in the npm package. Release archives the
+architecture and retains both pairs under `symbols` in the build drop.
+PDBs are not source-indexed or included in the npm package. Release archives the
 PDBs to Symweb/MSDL under project `DDE`, feature `VSCodeDeviceId`; the release
 pipeline needs BARSD approval for the `VSEng-SymbolsUpload` service connection.
 The current MicroBuild archive task filters out `.node` binaries, so the exact
