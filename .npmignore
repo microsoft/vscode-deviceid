@@ -18,3 +18,7 @@ tsfmt.json
 dist/test
 injectVersion.js
 *.proposed.*.d.ts
+test
+symbols
+*.pdb
+scripts/verify-package.mjs
