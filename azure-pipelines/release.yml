@@ -46,6 +46,31 @@ extends:
         - powershell: | 
             Get-ChildItem -Path "$(Pipeline.Workspace)/CI/npmpackages"
           displayName: Display contents of npmpackages
+
+        - powershell: |
+            $ErrorActionPreference = 'Stop'
+            foreach ($arch in @('x64', 'arm64')) {
+              $symbols = "$(Pipeline.Workspace)\CI\symbols\win32-$arch"
+              foreach ($name in @('@vscode+deviceid.node', 'windows.pdb')) {
+                $file = Join-Path $symbols $name
+                if (-not (Test-Path -LiteralPath $file -PathType Leaf)) {
+                  throw "Required Windows $arch symbol input is missing: $file"
+                }
+              }
+            }
+          displayName: 'Validate Windows binaries and matching PDBs'
+
+        # MicroBuild archives PDBs but filters out .node binaries; those remain in drop.
+        - task: MicroBuildArchiveSymbols@6
+          displayName: 'Archive Windows prebuild PDBs to Symweb/MSDL'
+          inputs:
+            ServiceConnectionId: 'VSEng-SymbolsUpload'
+            SymbolsFeatureName: 'VSCodeDeviceId'
+            SymbolsProject: 'DDE'
+            SymbolsAgentPath: '$(Pipeline.Workspace)\CI\symbols'
+          env:
+            SYSTEM_ACCESSTOKEN: $(System.AccessToken)
+
         - template: /azure-pipelines/MicroBuild.Publish.yml@MicroBuildTemplate
           parameters: 
             intent: 'PackageDistribution'
